@@ -38,6 +38,12 @@ class Medium {
   /// The date at which the photo or video was modified.
   final DateTime? modifiedDate;
 
+  /// Selected position
+  int? selectedPosition;
+
+  /// File path
+  String? path;
+
   Medium({
     required this.id,
     this.filename,
@@ -48,7 +54,9 @@ class Medium {
     this.orientation = 0,
     this.mimeType,
     this.duration = 0,
+    this.selectedPosition,
     this.creationDate,
+    this.path,
     this.modifiedDate,
   });
 
@@ -62,6 +70,8 @@ class Medium {
         height = json["height"],
         orientation = json["orientation"],
         mimeType = json["mimeType"],
+        selectedPosition = json["selectedPosition"],
+        path = json["path"],
         duration = json['duration'] ?? 0,
         creationDate = json['creationDate'] != null
             ? DateTime.fromMillisecondsSinceEpoch(json['creationDate'])
@@ -82,6 +92,8 @@ class Medium {
       mimeType: map["mimeType"],
       creationDate: map['creationDate'],
       modifiedDate: map['modifiedDate'],
+      selectedPosition: map['selectedPosition'],
+      path: map['path'],
     );
   }
 
@@ -97,6 +109,8 @@ class Medium {
       "width": this.width,
       "creationDate": this.creationDate,
       "modifiedDate": this.modifiedDate,
+      "path": this.path,
+      "selectedPosition": this.selectedPosition,
     };
   }
 
@@ -126,18 +140,18 @@ class Medium {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Medium &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          filename == other.filename &&
-          title == other.title &&
-          mediumType == other.mediumType &&
-          width == other.width &&
-          height == other.height &&
-          orientation == other.orientation &&
-          mimeType == other.mimeType &&
-          creationDate == other.creationDate &&
-          modifiedDate == other.modifiedDate;
+          other is Medium &&
+              runtimeType == other.runtimeType &&
+              id == other.id &&
+              filename == other.filename &&
+              title == other.title &&
+              mediumType == other.mediumType &&
+              width == other.width &&
+              height == other.height &&
+              orientation == other.orientation &&
+              mimeType == other.mimeType &&
+              creationDate == other.creationDate &&
+              modifiedDate == other.modifiedDate;
 
   @override
   int get hashCode =>
@@ -163,6 +177,8 @@ class Medium {
         'orientation: $orientation, '
         'mimeType: $mimeType, '
         'creationDate: $creationDate, '
+        'selectedPosition: $selectedPosition, '
+        'path: $path, '
         'modifiedDate: $modifiedDate}';
   }
 }

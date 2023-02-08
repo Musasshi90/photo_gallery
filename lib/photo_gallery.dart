@@ -36,21 +36,36 @@ class PhotoGallery {
 
   /// List all available media in a specific album, support pagination of media
   static Future<MediaPage> _listMedia({
-    required Album album,
+    Album? album,
     bool newest = true,
     required int total,
     int? skip,
     int? take,
   }) async {
     final json = await _channel.invokeMethod('listMedia', {
-      'albumId': album.id,
-      'mediumType': mediumTypeToJson(album.mediumType),
+      'albumId': album?.id,
+      'mediumType': mediumTypeToJson(album?.mediumType),
       'newest': newest,
       'total': total,
       'skip': skip,
       'take': take,
     });
     return MediaPage.fromJson(album, json);
+  }
+
+
+  /// List all available media in a specific album, support pagination of media
+  static Future<MediaPage> listAllMedia({
+    bool newest = true,
+    int? skip,
+    int? take,
+  }) async {
+    final json = await _channel.invokeMethod('listAllMedia', {
+      'newest': newest,
+      'skip': skip,
+      'take': take,
+    });
+    return MediaPage.fromJson(null, json);
   }
 
   /// Get medium metadata by medium id

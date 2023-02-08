@@ -4,6 +4,7 @@ part of photogallery;
 enum MediumType {
   image,
   video,
+  camera,
 }
 
 String? mediumTypeToJson(MediumType? value) {
@@ -12,6 +13,8 @@ String? mediumTypeToJson(MediumType? value) {
       return 'image';
     case MediumType.video:
       return 'video';
+    case MediumType.camera:
+      return 'camera';
     default:
       return null;
   }
@@ -23,6 +26,8 @@ MediumType? jsonToMediumType(String? value) {
       return MediumType.image;
     case 'video':
       return MediumType.video;
+    case 'camera':
+      return MediumType.camera;
     default:
       return null;
   }

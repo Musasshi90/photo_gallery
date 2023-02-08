@@ -31,7 +31,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> initAsync() async {
     if (await _promptPermissionSetting()) {
       List<Album> albums =
-          await PhotoGallery.listAlbums(mediumType: MediumType.image);
+      await PhotoGallery.listAlbums(mediumType: MediumType.image);
       setState(() {
         _albums = albums;
         _loading = false;
@@ -44,8 +44,8 @@ class _MyAppState extends State<MyApp> {
 
   Future<bool> _promptPermissionSetting() async {
     if (Platform.isIOS &&
-            await Permission.storage.request().isGranted &&
-            await Permission.photos.request().isGranted ||
+        await Permission.storage.request().isGranted &&
+        await Permission.photos.request().isGranted ||
         Platform.isAndroid && await Permission.storage.request().isGranted) {
       return true;
     }
@@ -61,80 +61,80 @@ class _MyAppState extends State<MyApp> {
         ),
         body: _loading
             ? Center(
-                child: CircularProgressIndicator(),
-              )
+          child: CircularProgressIndicator(),
+        )
             : LayoutBuilder(
-                builder: (context, constraints) {
-                  double gridWidth = (constraints.maxWidth - 20) / 3;
-                  double gridHeight = gridWidth + 33;
-                  double ratio = gridWidth / gridHeight;
-                  return Container(
-                    padding: EdgeInsets.all(5),
-                    child: GridView.count(
-                      childAspectRatio: ratio,
-                      crossAxisCount: 3,
-                      mainAxisSpacing: 5.0,
-                      crossAxisSpacing: 5.0,
-                      children: <Widget>[
-                        ...?_albums?.map(
-                          (album) => GestureDetector(
-                            onTap: () => Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (context) => AlbumPage(album))),
-                            child: Column(
-                              children: <Widget>[
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                  child: Container(
-                                    color: Colors.grey[300],
-                                    height: gridWidth,
-                                    width: gridWidth,
-                                    child: FadeInImage(
-                                      fit: BoxFit.cover,
-                                      placeholder:
-                                          MemoryImage(kTransparentImage),
-                                      image: AlbumThumbnailProvider(
-                                        albumId: album.id,
-                                        mediumType: album.mediumType,
-                                        highQuality: true,
-                                      ),
-                                    ),
-                                  ),
+          builder: (context, constraints) {
+            double gridWidth = (constraints.maxWidth - 20) / 3;
+            double gridHeight = gridWidth + 33;
+            double ratio = gridWidth / gridHeight;
+            return Container(
+              padding: EdgeInsets.all(5),
+              child: GridView.count(
+                childAspectRatio: ratio,
+                crossAxisCount: 3,
+                mainAxisSpacing: 5.0,
+                crossAxisSpacing: 5.0,
+                children: <Widget>[
+                  ...?_albums?.map(
+                        (album) => GestureDetector(
+                      onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (context) => AlbumPage(album))),
+                      child: Column(
+                        children: <Widget>[
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(5.0),
+                            child: Container(
+                              color: Colors.grey[300],
+                              height: gridWidth,
+                              width: gridWidth,
+                              child: FadeInImage(
+                                fit: BoxFit.cover,
+                                placeholder:
+                                MemoryImage(kTransparentImage),
+                                image: AlbumThumbnailProvider(
+                                  albumId: album.id,
+                                  mediumType: album.mediumType,
+                                  highQuality: true,
                                 ),
-                                Container(
-                                  alignment: Alignment.topLeft,
-                                  padding: EdgeInsets.only(left: 2.0),
-                                  child: Text(
-                                    album.name ?? "Unnamed Album",
-                                    maxLines: 1,
-                                    textAlign: TextAlign.start,
-                                    style: TextStyle(
-                                      height: 1.2,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  alignment: Alignment.topLeft,
-                                  padding: EdgeInsets.only(left: 2.0),
-                                  child: Text(
-                                    album.count.toString(),
-                                    textAlign: TextAlign.start,
-                                    style: TextStyle(
-                                      height: 1.2,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                          Container(
+                            alignment: Alignment.topLeft,
+                            padding: EdgeInsets.only(left: 2.0),
+                            child: Text(
+                              album.name ?? "Unnamed Album",
+                              maxLines: 1,
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                height: 1.2,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            alignment: Alignment.topLeft,
+                            padding: EdgeInsets.only(left: 2.0),
+                            child: Text(
+                              album.count.toString(),
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                height: 1.2,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -182,7 +182,7 @@ class AlbumPageState extends State<AlbumPage> {
           crossAxisSpacing: 1.0,
           children: <Widget>[
             ...?_media?.map(
-              (medium) => GestureDetector(
+                  (medium) => GestureDetector(
                 onTap: () => Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => ViewerPage(medium))),
                 child: Container(
@@ -227,13 +227,13 @@ class ViewerPage extends StatelessWidget {
           alignment: Alignment.center,
           child: medium.mediumType == MediumType.image
               ? FadeInImage(
-                  fit: BoxFit.cover,
-                  placeholder: MemoryImage(kTransparentImage),
-                  image: PhotoProvider(mediumId: medium.id),
-                )
+            fit: BoxFit.cover,
+            placeholder: MemoryImage(kTransparentImage),
+            image: PhotoProvider(mediumId: medium.id),
+          )
               : VideoProvider(
-                  mediumId: medium.id,
-                ),
+            mediumId: medium.id,
+          ),
         ),
       ),
     );
@@ -281,25 +281,25 @@ class _VideoProviderState extends State<VideoProvider> {
     return _controller == null || !_controller!.value.isInitialized
         ? Container()
         : Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              AspectRatio(
-                aspectRatio: _controller!.value.aspectRatio,
-                child: VideoPlayer(_controller!),
-              ),
-              FlatButton(
-                onPressed: () {
-                  setState(() {
-                    _controller!.value.isPlaying
-                        ? _controller!.pause()
-                        : _controller!.play();
-                  });
-                },
-                child: Icon(
-                  _controller!.value.isPlaying ? Icons.pause : Icons.play_arrow,
-                ),
-              ),
-            ],
-          );
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        AspectRatio(
+          aspectRatio: _controller!.value.aspectRatio,
+          child: VideoPlayer(_controller!),
+        ),
+        TextButton(
+          onPressed: () {
+            setState(() {
+              _controller!.value.isPlaying
+                  ? _controller!.pause()
+                  : _controller!.play();
+            });
+          },
+          child: Icon(
+            _controller!.value.isPlaying ? Icons.pause : Icons.play_arrow,
+          ),
+        ),
+      ],
+    );
   }
 }

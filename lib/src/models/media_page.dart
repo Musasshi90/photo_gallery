@@ -3,7 +3,7 @@ part of photogallery;
 /// A list of media with pagination support.
 @immutable
 class MediaPage {
-  final Album album;
+  final Album? album;
 
   /// The sort direction is newest or not
   final bool newest;
@@ -42,15 +42,27 @@ class MediaPage {
     );
   }
 
+  /// Gets the next page of media in the album.
+  Future<MediaPage> nextPageAllMedia(int take) {
+    print('End:$end');
+    print('Take:$take');
+    print('Newest:$newest');
+    return PhotoGallery.listAllMedia(
+      newest: newest,
+      skip: end,
+      take: take,
+    );
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is MediaPage &&
-          runtimeType == other.runtimeType &&
-          album == other.album &&
-          start == other.start &&
-          total == other.total &&
-          listEquals(items, other.items);
+          other is MediaPage &&
+              runtimeType == other.runtimeType &&
+              album == other.album &&
+              start == other.start &&
+              total == other.total &&
+              listEquals(items, other.items);
 
   @override
   int get hashCode =>

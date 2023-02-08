@@ -26,7 +26,13 @@ public class SwiftPhotoGalleryPlugin: NSObject, FlutterPlugin {
       let skip = arguments["skip"] as? NSNumber
       let take = arguments["take"] as? NSNumber
       result(listMedia(albumId: albumId, mediumType: mediumType, newest: newest, skip: skip, take: take))
-    }
+    }else if(call.method == "listAllMedia") {
+       let arguments = call.arguments as! Dictionary<String, AnyObject>
+       let newest = arguments["newest"] as! Bool
+       let skip = arguments["skip"] as? NSNumber
+       let take = arguments["take"] as? NSNumber
+       result(listAllMedia(newest: newest, skip: skip, take: take))
+     }
     else if(call.method == "getMedium") {
       let arguments = call.arguments as! Dictionary<String, AnyObject>
       let mediumId = arguments["mediumId"] as! String
@@ -87,25 +93,25 @@ public class SwiftPhotoGalleryPlugin: NSObject, FlutterPlugin {
       result(FlutterMethodNotImplemented)
     }
   }
-  
+
   private var assetCollections : [PHAssetCollection]  = []
-  
+
   private func listAlbums(mediumType: String, hideIfEmpty: Bool? = true) -> [NSDictionary] {
     self.assetCollections = []
     let fetchOptions = PHFetchOptions()
     var total = 0
     var albums = [NSDictionary]()
     var albumIds = Set<String>()
-    
+
     func addCollection (collection: PHAssetCollection, hideIfEmpty: Bool) -> Void {
       let kRecentlyDeletedCollectionSubtype = PHAssetCollectionSubtype(rawValue: 1000000201)
       guard collection.assetCollectionSubtype != kRecentlyDeletedCollectionSubtype else { return }
-      
+
       // De-duplicate by id.
       let albumId = collection.localIdentifier
       guard !albumIds.contains(albumId) else { return }
       albumIds.insert(albumId)
-      
+
       let options = PHFetchOptions()
       options.predicate = self.predicateFromMediumType(mediumType: mediumType)
       if #available(iOS 9, *) {
@@ -123,13 +129,13 @@ public class SwiftPhotoGalleryPlugin: NSObject, FlutterPlugin {
         ])
       }
     }
-    
+
     func processPHAssetCollections(fetchResult: PHFetchResult<PHAssetCollection>, hideIfEmpty: Bool) -> Void {
       fetchResult.enumerateObjects { (assetCollection, _, _) in
         addCollection(collection: assetCollection, hideIfEmpty: hideIfEmpty)
       }
     }
-    
+
     func processPHCollections (fetchResult: PHFetchResult<PHCollection>, hideIfEmpty: Bool) -> Void {
       fetchResult.enumerateObjects { (collection, _, _) in
         if let assetCollection = collection as? PHAssetCollection {
@@ -139,38 +145,69 @@ public class SwiftPhotoGalleryPlugin: NSObject, FlutterPlugin {
         }
       }
     }
-    
+
     // Smart Albums.
     processPHAssetCollections(
       fetchResult: PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .albumRegular, options: fetchOptions),
       hideIfEmpty: hideIfEmpty ?? true
     )
-    
+
     // User-created collections.
     processPHCollections(
       fetchResult: PHAssetCollection.fetchTopLevelUserCollections(with: fetchOptions),
       hideIfEmpty: hideIfEmpty ?? true
     )
-    
+
     albums.insert([
       "id": "__ALL__",
       "mediumType": mediumType,
       "name": "All",
       "count" : countMedia(collection: nil, mediumTypes: [mediumType]),
     ], at: 0)
-    
+
     return albums
   }
-  
+
   private func countMedia(collection: PHAssetCollection?, mediumTypes: [String]) -> Int {
     let options = PHFetchOptions()
     options.predicate = self.predicateFromMediumTypes(mediumTypes: mediumTypes)
     if(collection == nil) {
       return PHAsset.fetchAssets(with: options).count
     }
-    
+
     return PHAsset.fetchAssets(in: collection ?? PHAssetCollection.init(), options: options).count
   }
+
+  private func listAllMedia(newest: Bool, skip: NSNumber?, take: NSNumber?) -> NSDictionary {
+      let fetchOptions = PHFetchOptions()
+      fetchOptions.sortDescriptors = [
+        NSSortDescriptor(key: "creationDate", ascending: newest ? false : true),
+        NSSortDescriptor(key: "modificationDate", ascending: newest ? false : true)
+      ]
+
+      let collection = self.assetCollections.first(where: { (collection) -> Bool in
+        collection.localIdentifier == albumId
+      })
+
+      let fetchResult = albumId == "__ALL__"
+        ? PHAsset.fetchAssets(with: fetchOptions)
+        : PHAsset.fetchAssets(in: collection ?? PHAssetCollection.init(), options: fetchOptions)
+      let start = skip?.intValue ?? 0
+      let total = fetchResult.count
+      let end = take == nil ? total : min(start + take!.intValue, total)
+      var items = [[String: Any?]]()
+      for index in start..<end {
+        let asset = fetchResult.object(at: index) as PHAsset
+        items.append(getMediumFromAsset(asset: asset))
+      }
+
+      return [
+        "newest": newest,
+        "start": start,
+        "total": total,
+        "items": items,
+      ]
+    }
   
   private func listMedia(albumId: String, mediumType: String, newest: Bool, skip: NSNumber?, take: NSNumber?) -> NSDictionary {
     let fetchOptions = PHFetchOptions()
