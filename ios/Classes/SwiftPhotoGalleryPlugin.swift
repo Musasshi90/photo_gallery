@@ -184,14 +184,9 @@ public class SwiftPhotoGalleryPlugin: NSObject, FlutterPlugin {
         NSSortDescriptor(key: "creationDate", ascending: newest ? false : true),
         NSSortDescriptor(key: "modificationDate", ascending: newest ? false : true)
       ]
+      fetchOptions.predicate = NSPredicate(format: "mediaType = %d || mediaType = %d", PHAssetMediaType.image.rawValue, PHAssetMediaType.video.rawValue)
 
-      let collection = self.assetCollections.first(where: { (collection) -> Bool in
-        collection.localIdentifier == albumId
-      })
-
-      let fetchResult = albumId == "__ALL__"
-        ? PHAsset.fetchAssets(with: fetchOptions)
-        : PHAsset.fetchAssets(in: collection ?? PHAssetCollection.init(), options: fetchOptions)
+      let fetchResult = PHAsset.fetchAssets(with: fetchOptions)
       let start = skip?.intValue ?? 0
       let total = fetchResult.count
       let end = take == nil ? total : min(start + take!.intValue, total)
@@ -200,6 +195,7 @@ public class SwiftPhotoGalleryPlugin: NSObject, FlutterPlugin {
         let asset = fetchResult.object(at: index) as PHAsset
         items.append(getMediumFromAsset(asset: asset))
       }
+
 
       return [
         "newest": newest,
